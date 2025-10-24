@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Philosophical Perspectives</title>
+
+    <!-- Including the main.css file for styling -->
+    <link rel="stylesheet" href="css/main.css">
+
+    <!-- Including the Font Awesome CSS library for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+</head>
+
+<body>
+
+    <!-- Navigation bar -->
+    <div class="topnav" id="myTopnav">
+        <!-- Links to different sections -->
+        <a href="index.html">Abstract</a>
+        <a href="section1.html">What Is Free Will?</a>
+        <a href="section2.html">Classical View</a>
+
+        <!-- Active link pointing to the section3.html page -->
+        <a class="active" href="section3.html">Philosophical Perspectives</a>
+
+        <a href="see_also.html">Why It Matters</a>
+        <a href="references.html">References</a>
+
+        <!-- "Hamburger menu" / "Bar icon" to toggle the navigation links on smaller screens -->
+        <a href="javascript:void(0);" class="icon">
+            <i class="fa fa-bars"></i>
+        </a>
+    </div>
+
+    <!-- Page content -->
+    <div class="content">
+        <!-- Section 3 content -->
+        <p>Philosophers today tend to fall into three main camps:        
+    
+        <div class="tab">
+            <button class="tablinks" onclick="openCity(event, 'libertarians')">Libertarians</button>
+            <button class="tablinks" onclick="openCity(event, 'determinism')">Determinism</button>
+            <button class="tablinks" onclick="openCity(event, 'compatibilists')">Compatibilists</button>
+        </div>
+
+        <!-- Tab content -->
+        <div id="libertarians" class="tabcontent">
+            <h3>Libertarians</h3>
+            <p>The belief that free will is incompatible with determinism, and agents have free will. They, therefore, reject determinism.</p>
+        </div>
+
+        <div id="determinism" class="tabcontent">
+            <h3>Determinism</h3>
+            <p>Argue that every choice is caused by prior events and natural laws—making free will impossible.</p>
+        </div>
+
+        <div id="compatibilists" class="tabcontent">
+            <h3>Compatibilists</h3>
+            <p>Take a middle ground, suggesting that free will and determinism can coexist if we redefine “freedom” as acting according to one’s motives without external coercion.</p>
+        </div>
+    </div>
+    <!-- Including the main.js file for JavaScript functionality -->
+    <script src="js/main.js"></script>
+
+</body>
+
+</html>
