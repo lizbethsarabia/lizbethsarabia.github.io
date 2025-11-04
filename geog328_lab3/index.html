@@ -1,11 +1,173 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en-US">
     <head>
-        <meta charset="UTF-8">
-        <meta http-equiv="refresh" content="0; url=earthquake.html">
-        <title>Redirecting...</title>
+        <meta charset="utf-8">
+        <title>Seattle Community Centers Map</title>
+        <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
+        <link href="https://api.mapbox.com/mapbox-gl-js/v2.5.0/mapbox-gl.css" rel="stylesheet">
+        <script src="https://api.mapbox.com/mapbox-gl-js/v2.5.0/mapbox-gl.js"></script>
+
+        <style>
+            body {
+                margin: 0;
+                padding: 0;
+            }
+
+            #container {
+                display: flex;
+                height: 100vh;
+                flex-direction: row;
+                align-items: stretch;
+            }
+
+            #side-panel {
+                flex-basis: 500px;
+                overflow-y: scroll;
+            }
+
+            #map {
+                flex-grow: 1;
+            }
+
+            button {
+                margin-bottom: 10px;
+            }
+
+            table{
+                border-collapse: collapse;
+                border-spacing: 0;
+                width: 100%;
+                border: 1px solid #ddd;
+            }
+
+            th,
+            td {
+                text-align: left;
+                padding: 16px;
+            }
+
+            tr:nth-child(even) {
+                background-color: #f2f2f2;
+            }
+        </style>
     </head>
+
     <body>
-        <p>If you are not redirected automatically, <a href="earthquake.html">click here</a>.</p>
+        <main id="container">
+        <div id="side-panel">
+            <h2>Seattle Community Centers</h2>
+            <button>Sort by Hours</button>
+
+            <table>
+                <tr>
+                    <th>Name</th>
+                    <th>Status</th>
+                    <th>Total Hours</th>
+                </tr>
+            </table>
+        </div>
+        <div id="map"></div>
+        </main>
+
+        <script>
+        mapboxgl.accessToken = 'pk.eyJ1IjoibGl6c2FyYWJpYSIsImEiOiJjbWhndG9icmkwYmk1MnJwdDJseGtibXczIn0.IugG6V-LI1Fi8rJiHlva2g';
+
+        let map = new mapboxgl.Map({
+        container: 'map',
+        style: 'mapbox://styles/mapbox/outdoors-v12',
+        zoom: 11,
+        center: [-122.3321, 47.6062] // Seattle
+        });
+
+        async function geojsonFetch() {
+            let response, centers, table;
+            response = await fetch('assets/seattle_parks.geojson'); // <-- your file path
+            centers = await response.json();
+
+            map.on('load', function loadingData() {
+                map.addSource('centers', {
+                    type: 'geojson',
+                    data: centers
+                });
+
+                map.addLayer({
+                    'id': 'centers-layer',
+                    'type': 'circle',
+                    'source': 'centers',
+                    'paint': {
+                        'circle-radius': 8,
+                        'circle-stroke-width': 2,
+                        'circle-color': 'red',
+                        'circle-stroke-color': 'white'
+                    }
+                });
+
+          // Popup for each center
+            map.on('click', 'centers-layer', (e) => {
+                const props = e.features[0].properties;
+                new mapboxgl.Popup()
+                .setLngLat(e.lngLat)
+                .setHTML(`
+                    <strong>${props.NAME}</strong><br>
+                    ${props.ADDRESS}<br>
+                    <em>Status:</em> ${props.OPERATIONALSTATUS}<br>
+                    <a href="${props.WEBSITE_LINK}" target="_blank">Visit Website</a>
+                `)
+                .addTo(map);
+            });
+
+            map.on('mouseenter', 'centers-layer', () => {
+                map.getCanvas().style.cursor = 'pointer';
+            });
+            map.on('mouseleave', 'centers-layer', () => {
+                map.getCanvas().style.cursor = '';
+            });
+            });
+
+        // Fill table
+            table = document.getElementsByTagName("table")[0];
+            let row, cell1, cell2, cell3;
+            for (let i = 0; i < centers.features.length; i++) {
+                let props = centers.features[i].properties;
+                row = table.insertRow(-1);
+                cell1 = row.insertCell(0);
+                cell2 = row.insertCell(1);
+                cell3 = row.insertCell(2);
+                cell1.innerHTML = props.NAME || 'Unnamed';
+                cell2.innerHTML = props.OPERATIONALSTATUS || 'Unknown';
+                cell3.innerHTML = props.TOTALHOURSOFOPERATION || 'N/A';
+            }
+        };
+
+      // Sort table by total hours
+        let btn = document.getElementsByTagName("button")[0];
+        btn.addEventListener('click', sortTable);
+
+        function sortTable(e) {
+            let table, rows, switching, i, x, y, shouldSwitch;
+            table = document.getElementsByTagName("table")[0];
+            switching = true;
+            while (switching) {
+                switching = false;
+                rows = table.rows;
+                for (i = 1; i < (rows.length - 1); i++) {
+                    shouldSwitch = false;
+                    x = parseFloat(rows[i].getElementsByTagName("td")[2].innerHTML) || 0;
+                    y = parseFloat(rows[i + 1].getElementsByTagName("td")[2].innerHTML) || 0;
+                    if (x < y) {
+                        shouldSwitch = true;
+                        break;
+                    }
+                }
+                if (shouldSwitch) {
+                    rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+                    switching = true;
+                }
+            }
+        }
+
+        geojsonFetch();
+        </script>
     </body>
 </html>
+
